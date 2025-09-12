@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 /// Interface for HTTP service operations
-abstract class HttpServiceInterface {
+abstract class ApiServiceInterface {
   /// Make a POST request
   Future<Response<T>> post<T>(
     String path, {

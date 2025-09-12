@@ -1,3 +1,71 @@
+/// 🚀 Paymob Flutter SDK
+/// 
+/// The most comprehensive and developer-friendly Paymob payment integration 
+/// for Flutter applications. Supports all Paymob payment methods, iframes, 
+/// multi-environment configurations, and clean architecture.
+/// 
+/// ## Features
+/// 
+/// - **🔧 Easy Integration** - Simple setup with comprehensive configuration management
+/// - **🌍 Multi-Environment Support** - Separate configurations for test and live environments
+/// - **💳 Multiple Payment Methods** - Support for all Paymob payment methods
+/// - **🖼️ Iframe Integration** - Built-in iframe support for web-based payments
+/// - **🔒 Secure** - Follows security best practices and Paymob guidelines
+/// - **📱 Cross-Platform** - Works on iOS, Android, Web, and Desktop
+/// 
+/// ## Quick Start
+/// 
+/// ```dart
+/// import 'package:pay_with_paymob_flutter/paymob_flutter.dart';
+/// 
+/// void main() {
+///   WidgetsFlutterBinding.ensureInitialized();
+///   
+///   PaymobFlutter.instance.initialize(
+///     apiKey: "your_api_key",
+///     paymentMethods: [PaymobPaymentMethod.valu],
+///     iframes: [PaymobIframe(iframeId: 123, integrationId: 456)],
+///   );
+///   
+///   runApp(MyApp());
+/// }
+/// ```
+/// 
+/// ## Payment Processing
+/// 
+/// ```dart
+/// PaymobFlutter.instance.payWithCustomMethod(
+///   context: context,
+///   paymentMethod: PaymobPaymentMethod.valu,
+///   currency: "EGP",
+///   amount: 100.0,
+///   onPayment: (response) {
+///     if (response.success) {
+///       print("Payment successful!");
+///     }
+///   },
+/// );
+/// ```
+/// 
+/// ## Environment Configuration
+/// 
+/// ```dart
+/// // Set environment
+/// ConfigManager.setEnvironment(Environment.live);
+/// 
+/// // Get configuration
+/// final config = ConfigManager.currentConfig;
+/// 
+/// // Initialize with configuration
+/// PaymobFlutter.instance.initializeWithConfig(
+///   apiKey: config.apiKey,
+///   paymentMethods: config.paymentMethods,
+///   iframes: config.iframes,
+///   defaultIntegrationId: config.defaultIntegrationId,
+/// );
+/// ```
+/// 
+/// For more information, see the [README](https://github.com/seragsabrysakr/pay_with_paymob_flutter).
 library pay_with_paymob_flutter;
 
 import 'package:flutter/material.dart';
@@ -35,7 +103,7 @@ class PaymobFlutter implements PaymentServiceInterface {
   PaymobFlutter._internal();
 
   // Dependencies (Dependency Inversion Principle)
-  late final HttpServiceInterface _httpService;
+  late final ApiServiceInterface _httpService;
   late final PaymentApiService _paymentApiService;
   
   // Configuration
@@ -155,19 +223,19 @@ class PaymobFlutter implements PaymentServiceInterface {
       // Request wallet URL
       final subtype = customSubtype ?? config?.customSubtype ?? paymentMethod.subtype;
       final finalIdentifier = integrationId.toString();
-      final walletUrl = await _paymentApiService.requestWalletUrl(
+      final payUrl = await _paymentApiService.requestPayUrl(
         paymentToken: paymentToken,
         identifier: finalIdentifier,
         subtype: subtype,
       );
-      debugPrint('walletUrl: $walletUrl');
+      debugPrint('walletUrl: $payUrl');
       // Show payment interface
       if (context.mounted) {
         await PaymobIFrameInApp.show(
           title: title ?? Text(paymentMethod.displayName),
           appBarColor: appBarColor,
           context: context,
-          redirectURL: walletUrl,
+          redirectURL: payUrl,
           onPayment: (response) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               onPayment?.call(response);
@@ -264,15 +332,5 @@ class PaymobFlutter implements PaymentServiceInterface {
       final availableNames = _availableIframes.map((i) => i.name ?? i.iframeId.toString()).toList();
       throw IframeNotAvailableException(iframe.name ?? iframe.iframeId.toString(), availableNames);
     }
-  }
-
-  /// Reset the service (useful for testing)
-  void reset() {
-    _isInitialized = false;
-    _apiKey = null;
-    _availablePaymentMethods.clear();
-    _availableIframes.clear();
-    _defaultIntegrationId = null;
-    _paymentApiService.clearAuth();
   }
 }

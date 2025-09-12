@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter/material.dart';
 
 import '../core/constants/api_constants.dart';
 import '../core/exceptions/paymob_exceptions.dart';
@@ -9,23 +7,23 @@ import '../models/billing_data.dart';
 
 /// Service for handling payment API operations
 class PaymentApiService {
-  final HttpServiceInterface _httpService;
+  final ApiServiceInterface _apiService;
   String? _authToken;
   int? _orderId;
 
-  PaymentApiService(this._httpService);
+  PaymentApiService(this._apiService);
 
   /// Get API authentication token
   Future<String> getApiKey(String apiKey) async {
     try {
-      final response = await _httpService.post(
+      final response = await _apiService.post<Map<String, dynamic>>(
         ApiConstants.authorization,
         data: {"api_key": apiKey},
       );
 
       if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
-        _authToken = response.data["token"];
-        _httpService.setAuthToken(_authToken!);
+        _authToken = response.data?["token"]?.toString();
+        _apiService.setAuthToken(_authToken!);
         return _authToken!;
       } else {
         throw const InvalidApiKeyException();
@@ -43,19 +41,19 @@ class PaymentApiService {
     }
 
     try {
-      final response = await _httpService.post(
+      final response = await _apiService.post<Map<String, dynamic>>(
         ApiConstants.order,
         data: {
           "auth_token": _authToken,
           "delivery_needed": false,
           "amount_cents": ((amount * 100).round()).toString(),
           "currency": currency,
-          "items": []
+          "items": <Map<String, dynamic>>[]
         },
       );
 
       if (response.statusCode != null && response.statusCode! >= 200) {
-        _orderId = response.data["id"];
+        _orderId = int.tryParse(response.data?["id"]?.toString() ?? '0');
         return _orderId!;
       } else {
         throw const OrderCreationException();
@@ -79,7 +77,7 @@ class PaymentApiService {
     }
 
     try {
-      final response = await _httpService.post(
+      final response = await _apiService.post<Map<String, dynamic>>(
         ApiConstants.keys,
         data: {
           "auth_token": _authToken,
@@ -94,7 +92,7 @@ class PaymentApiService {
       );
 
       if (response.statusCode != null && response.statusCode! >= 200) {
-        return response.data["token"];
+        return response.data?["token"]?.toString() ?? '';
       } else {
         throw const PaymentTokenException();
       }
@@ -105,7 +103,7 @@ class PaymentApiService {
   }
 
   /// Request wallet URL
-  Future<String> requestWalletUrl({
+  Future<String> requestPayUrl({
     required String paymentToken,
     String? identifier,
     String? subtype,
@@ -125,20 +123,24 @@ class PaymentApiService {
         }
       }
 log('requestData: $requestData');
-      final response = await _httpService.post(
+      final response = await _apiService.post<Map<String, dynamic>>(
         ApiConstants.wallet,
         data: requestData,
       );
 log('response: $response');
       if (response.statusCode != null && response.statusCode! >= 200) {
         final body = response.data;
-        log('redirect_url: ${body["redirect_url"]}');
-        log('iframe_redirection_url: ${body["iframe_redirection_url"]}');
-        final walletUrl = ((body["redirect_url"] == null || body["redirect_url"].isEmpty)
-      
-            ? body["iframe_redirection_url"]
-            : body["redirect_url"]) ?? body["redirection_url"];
-        return walletUrl;
+        log('redirect_url: ${body?["redirect_url"]}');
+        log('iframe_redirection_url: ${body?["iframe_redirection_url"]}');
+        final redirectUrl = body?["redirect_url"]?.toString();
+        final iframeUrl = body?["iframe_redirection_url"]?.toString();
+        final redirectionUrl = body?["redirection_url"]?.toString();
+        
+        final walletUrl = (redirectUrl == null || redirectUrl.isEmpty)
+            ? iframeUrl
+            : redirectUrl;
+        
+        return walletUrl ?? redirectionUrl ?? '';
       } else {
         throw const WalletUrlException();
       }
@@ -154,6 +156,6 @@ log('response: $response');
   void clearAuth() {
     _authToken = null;
     _orderId = null;
-    _httpService.clearAuthToken();
+    _apiService.clearAuthToken();
   }
 }

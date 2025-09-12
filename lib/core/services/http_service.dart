@@ -4,9 +4,8 @@ import '../exceptions/paymob_exceptions.dart';
 import '../interfaces/http_service_interface.dart';
 
 /// HTTP service implementation using Dio with logging
-class HttpService implements HttpServiceInterface {
+class HttpService implements ApiServiceInterface {
   late final Dio _dio;
-  String? _authToken;
 
   HttpService() {
     _dio = Dio();
@@ -99,13 +98,11 @@ class HttpService implements HttpServiceInterface {
 
   @override
   void setAuthToken(String token) {
-    _authToken = token;
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
   @override
   void clearAuthToken() {
-    _authToken = null;
     _dio.options.headers.remove('Authorization');
   }
 
@@ -119,7 +116,7 @@ class HttpService implements HttpServiceInterface {
       
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        final message = error.response?.data?['message'] ?? 'API request failed';
+        final message = error.response?.data?['message']?.toString() ?? 'API request failed';
         return ApiRequestException(message, statusCode?.toString());
       
       case DioExceptionType.cancel:
@@ -132,7 +129,6 @@ class HttpService implements HttpServiceInterface {
         return const ApiRequestException('SSL certificate error');
       
       case DioExceptionType.unknown:
-      default:
         return ApiRequestException('Unknown error: ${error.message}');
     }
   }

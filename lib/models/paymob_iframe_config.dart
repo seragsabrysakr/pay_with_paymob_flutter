@@ -33,10 +33,10 @@ class PaymobIframe {
   /// Creates a [PaymobIframe] from a JSON map.
   factory PaymobIframe.fromJson(Map<String, dynamic> json) {
     return PaymobIframe(
-      iframeId: json["iframe_id"],
-      integrationId: json["integration_id"],
-      name: json["name"],
-      description: json["description"],
+      iframeId: int.tryParse(json["iframe_id"]?.toString() ?? '0') ?? 0,
+      integrationId: int.tryParse(json["integration_id"]?.toString() ?? '0') ?? 0,
+      name: json["name"]?.toString(),
+      description: json["description"]?.toString(),
     );
   }
 
