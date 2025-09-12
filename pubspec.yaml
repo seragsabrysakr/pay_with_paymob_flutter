@@ -1,12 +1,11 @@
 name: pay_with_paymob_flutter
 description: 🚀 The most comprehensive and developer-friendly Paymob payment integration for Flutter applications. Supports all Paymob payment methods, iframes, multi-environment configurations, and clean architecture.
 version: 1.0.0
-homepage: https://github.com/ahmedhosni803/pay_with_paymob_flutter
-repository: https://github.com/ahmedhosni803/pay_with_paymob_flutter
-issue_tracker: https://github.com/ahmedhosni803/pay_with_paymob_flutter/issues
-documentation: https://pub.dev/documentation/pay_with_paymob_flutter
-funding:
-  - https://github.com/sponsors/ahmedhosni803
+homepage: https://github.com/seragsabrysakr/pay_with_paymob_flutter
+repository: https://github.com/seragsabrysakr/pay_with_paymob_flutter
+issue_tracker: https://github.com/seragsabrysakr/pay_with_paymob_flutter
+documentation: https://github.com/seragsabrysakr/pay_with_paymob_flutter
+
 
 topics:
   - paymob

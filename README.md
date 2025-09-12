@@ -421,8 +421,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 - **📚 Documentation** - [Full Documentation](https://pub.dev/documentation/pay_with_paymob_flutter)
-- **🐛 Issues** - [Report Issues](https://github.com/your-username/pay_with_paymob_flutter/issues)
-- **💬 Discussions** - [GitHub Discussions](https://github.com/your-username/pay_with_paymob_flutter/discussions)
+- **🐛 Issues** - [Report Issues](https://github.com/seragsabrysakr/pay_with_paymob_flutter/issues)
+- **💬 Discussions** - [GitHub Discussions](https://github.com/seragsabrysakr/pay_with_paymob_flutter/discussions)
 - **📧 Email** - support@yourcompany.com
 
 ## 🙏 Acknowledgments
@@ -433,10 +433,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Stats
 
-![GitHub stars](https://img.shields.io/github/stars/your-username/pay_with_paymob_flutter?style=social)
-![GitHub forks](https://img.shields.io/github/forks/your-username/pay_with_paymob_flutter?style=social)
-![GitHub issues](https://img.shields.io/github/issues/your-username/pay_with_paymob_flutter)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/your-username/pay_with_paymob_flutter)
+![GitHub stars](https://img.shields.io/github/stars/seragsabrysakr/pay_with_paymob_flutter?style=social)
+![GitHub forks](https://img.shields.io/github/forks/seragsabrysakr/pay_with_paymob_flutter?style=social)
+![GitHub issues](https://img.shields.io/github/issues/seragsabrysakr/pay_with_paymob_flutter)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/seragsabrysakr/pay_with_paymob_flutter)
 
 ---
 
@@ -444,6 +444,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for the Flutter community**
 
-[⭐ Star this repo](https://github.com/your-username/pay_with_paymob_flutter) | [🐛 Report Bug](https://github.com/your-username/pay_with_paymob_flutter/issues) | [💡 Request Feature](https://github.com/your-username/pay_with_paymob_flutter/issues)
+[⭐ Star this repo](https://github.com/seragsabrysakr/pay_with_paymob_flutter) | [🐛 Report Bug](https://github.com/seragsabrysakr/pay_with_paymob_flutter/issues) | [💡 Request Feature](https://github.com/seragsabrysakr/pay_with_paymob_flutter/issues)
 
 </div>
