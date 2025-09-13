@@ -41,6 +41,14 @@ A powerful, feature-rich Flutter package that provides seamless integration with
 - **Error Handling** - Comprehensive exception handling
 - **Type Safety** - Full TypeScript-like type safety with Dart
 
+### 🆕 **Latest Features**
+- **🔗 Payment Links** - Create shareable payment links with unified API
+- **📱 Tabbed Example App** - Comprehensive demo with three organized tabs
+- **🔧 Flexible Identifiers** - Support for both numeric and text identifiers
+- **🌍 Environment Management** - Easy switching between test and live environments
+- **📊 Real-time Feedback** - Immediate success/error feedback for all operations
+- **🎨 Modern UI Components** - Clean, organized interface components
+
 ## 📦 Installation
 
 Add this to your package's `pubspec.yaml` file:
@@ -66,13 +74,26 @@ import 'package:pay_with_paymob_flutter/paymob_flutter.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Paymob
-  PaymobFlutter.instance.initialize(
+  // Initialize Paymob with configuration
+  PaymobFlutter.instance.initializeWithConfig(
     apiKey: "your_api_key",
     paymentMethods: [
-      PaymobPaymentMethod.applePay,
-      PaymobPaymentMethod.valu,
-      PaymobPaymentMethod.wallet,
+      PaymentMethodConfig(
+        paymentMethod: PaymobPaymentMethod.applePay,
+        identifier: '123456',
+        integrationId: '123456',
+        customSubtype: 'APPLE_PAY',
+        displayName: 'Apple Pay',
+        description: 'Pay securely with Apple Pay',
+      ),
+      PaymentMethodConfig(
+        paymentMethod: PaymobPaymentMethod.valu,
+        identifier: '789012',
+        integrationId: '789012',
+        customSubtype: 'VALU',
+        displayName: 'ValU',
+        description: 'Buy now, pay later with ValU',
+      ),
     ],
     iframes: [
       PaymobIframe(
@@ -82,6 +103,7 @@ void main() {
         description: "Main payment iframe",
       ),
     ],
+    defaultIntegrationId: 123456,
   );
   
   runApp(MyApp());
@@ -91,12 +113,23 @@ void main() {
 ### 2. **Process a Payment**
 
 ```dart
-// Simple payment
+// Get a configured payment method
+final paymentMethod = PaymobFlutter.instance.availablePaymentMethods.first;
+
+// Process payment
 PaymobFlutter.instance.payWithCustomMethod(
   context: context,
-  paymentMethod: PaymobPaymentMethod.valu,
+  paymentMethod: paymentMethod,
   currency: "EGP",
   amount: 100.0,
+  billingData: BillingData(
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@example.com",
+    phoneNumber: "01012345678",
+    city: "Cairo",
+    country: "Egypt",
+  ),
   onPayment: (response) {
     if (response.success) {
       print("Payment successful: ${response.message}");
@@ -121,8 +154,11 @@ class TestConfig {
     paymentMethods: [
       PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: "01010101010", // Phone number for ValU
-        integrationId: 123456,
+        identifier: '123456',
+        integrationId: "123456",
+        customSubtype: "VALU",
+        displayName: "ValU",
+        description: "Buy now, pay later with ValU",
       ),
     ],
     iframes: [/* test iframes */],
@@ -137,8 +173,11 @@ class LiveConfig {
     paymentMethods: [
       PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: "customer_phone",
-        integrationId: 789012,
+        identifier: '789012',
+        integrationId: "789012",
+        customSubtype: "VALU",
+        displayName: "ValU",
+        description: "Buy now, pay later with ValU",
       ),
     ],
     iframes: [/* live iframes */],
@@ -171,17 +210,88 @@ void main() {
 }
 ```
 
+## 🔧 API Reference
+
+### **Available Methods**
+
+```dart
+// Initialize with configuration
+Future<bool> initializeWithConfig({
+  required String apiKey,
+  required List<PaymentMethodConfig> paymentMethods,
+  required List<PaymobIframe> iframes,
+  required int defaultIntegrationId,
+});
+
+// Process payment with custom method
+Future<void> payWithCustomMethod({
+  required BuildContext context,
+  required PaymentMethodConfig paymentMethod,
+  required String currency,
+  required double amount,
+  BillingData? billingData,
+  Widget? title,
+  Color? appBarColor,
+  void Function(PaymentPaymobResponse response)? onPayment,
+});
+
+// Process payment with iframe
+Future<void> payWithIframe({
+  required BuildContext context,
+  required PaymobIframe iframe,
+  required String currency,
+  required double amount,
+  BillingData? billingData,
+  Widget? title,
+  Color? appBarColor,
+  void Function(PaymentPaymobResponse response)? onPayment,
+});
+
+// Create and open payment link
+Future<void> createPayLink({
+  required BuildContext context,
+  required String apiKey,
+  required PaymentLinkRequest request,
+  String? imagePath,
+  Widget? title,
+  Color? appBarColor,
+  void Function(PaymentPaymobResponse response)? onPayment,
+});
+```
+
+### **Available Properties**
+
+```dart
+// Get available payment methods
+List<PaymentMethodConfig> get availablePaymentMethods;
+
+// Get available iframes
+List<PaymobIframe> get availableIframes;
+
+// Check if initialized
+bool get isInitialized;
+```
+
 ## 💳 Payment Methods
 
 ### **Custom Payment Method**
 
 ```dart
+// Create a custom payment method configuration
+final customMethod = PaymentMethodConfig(
+  paymentMethod: PaymobPaymentMethod.valu,
+  identifier: '01012345678', // Customer phone/email
+  integrationId: '123456',
+  customSubtype: 'VALU',
+  displayName: 'ValU Payment',
+  description: 'Buy now, pay later with ValU',
+);
+
 PaymobFlutter.instance.payWithCustomMethod(
   context: context,
-  paymentMethod: PaymobPaymentMethod.valu,
+  paymentMethod: customMethod,
   currency: "EGP",
   amount: 150.0,
-  identifier: "01012345678", // Customer phone/email
   billingData: BillingData(
     firstName: "Serag",
     lastName: "Sakr",
@@ -272,6 +382,40 @@ await PaymobFlutter.instance.createPayLink(
 );
 ```
 
+## 📱 Example App
+
+The package includes a comprehensive example app with a **tabbed interface** demonstrating all features:
+
+### **Three Main Tabs:**
+
+1. **💳 Payment Methods Tab**
+   - Direct payments using `payWithCustomMethod`
+   - Organized by categories: Digital Wallets, Installment Services, Other Services
+   - Real-time payment processing with success/error feedback
+
+2. **🖼️ Iframe Tab**
+   - Embedded payment forms using `payWithIframe`
+   - All configured iframes with detailed information
+   - Seamless web-based payment experience
+
+3. **🔗 Payment Links Tab**
+   - Shareable payment links using `createPayLink`
+   - Same payment method organization as Payment Methods tab
+   - Customer-friendly payment link creation
+
+### **Key Features:**
+- **🌍 Environment Switcher** - Toggle between test and live environments
+- **📊 Real-time Feedback** - Success/error messages for all operations
+- **🎨 Modern UI** - Clean, organized interface with proper categorization
+- **📱 Responsive Design** - Works on all screen sizes
+
+### **Running the Example:**
+
+```bash
+cd example
+flutter run
+```
+
 ## 🎨 UI Components
 
 ### **Payment Method Selection**
@@ -281,9 +425,15 @@ ListView.builder(
   itemCount: PaymobFlutter.instance.availablePaymentMethods.length,
   itemBuilder: (context, index) {
     final method = PaymobFlutter.instance.availablePaymentMethods[index];
-    return PaymentMethodCard(
-      method: method,
-      onTap: () => _processPayment(method),
+    return Card(
+      child: ListTile(
+        title: Text(method.displayName),
+        subtitle: Text(method.description),
+        trailing: ElevatedButton(
+          onPressed: () => _processPayment(method),
+          child: Text("Pay"),
+        ),
+      ),
     );
   },
 )
@@ -312,13 +462,18 @@ Container(
 ```dart
 PaymentMethodConfig(
   paymentMethod: PaymobPaymentMethod.valu,
-  identifier: "customer_identifier",
-  integrationId: 123456,
-  customSubtype: "CUSTOM_SUBTYPE",
-  displayName: "Custom ValU",
-  description: "Custom ValU payment method",
+  identifier: '123456', // String identifier (can be numeric or text like 'AGGREGATOR')
+  integrationId: '123456', // String integration ID
+  customSubtype: 'VALU', // Payment method subtype
+  displayName: 'ValU Payment', // User-friendly display name
+  description: 'Buy now, pay later with ValU', // Description for users
 )
 ```
+
+**Identifier Types Supported:**
+- **Numeric IDs**: `'123456'`, `'789012'` (for most payment methods)
+- **Text Identifiers**: `'AGGREGATOR'` (for Kiosk payments)
+- **Phone Numbers**: `'01010101010'` (for Wallet payments)
 
 ### **Billing Data**
 
@@ -409,10 +564,27 @@ void handlePaymentResponse(PaymentPaymobResponse response) {
 void main() {
   group('PaymobFlutter Tests', () {
     test('should initialize with valid configuration', () async {
-      final result = await PaymobFlutter.instance.initialize(
+      final result = await PaymobFlutter.instance.initializeWithConfig(
         apiKey: "test_key",
-        paymentMethods: [PaymobPaymentMethod.valu],
-        iframes: [testIframe],
+        paymentMethods: [
+          PaymentMethodConfig(
+            paymentMethod: PaymobPaymentMethod.valu,
+            identifier: '123456',
+            integrationId: '123456',
+            customSubtype: 'VALU',
+            displayName: 'ValU',
+            description: 'Test ValU payment',
+          ),
+        ],
+        iframes: [
+          PaymobIframe(
+            iframeId: 123456,
+            integrationId: 123456,
+            name: "Test Iframe",
+            description: "Test iframe description",
+          ),
+        ],
+        defaultIntegrationId: 123456,
       );
       expect(result, isTrue);
     });
@@ -487,6 +659,31 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Paymob Team** - For providing excellent payment gateway services
 - **Flutter Community** - For the amazing Flutter framework
 - **Contributors** - All the amazing contributors who helped build this package
+
+## 🎯 Key Improvements in v1.0.0
+
+### **🔧 Enhanced Configuration System**
+- **String Identifiers**: Support for both numeric (`'123456'`) and text (`'AGGREGATOR'`) identifiers
+- **Flexible Payment Methods**: Easy configuration with `PaymentMethodConfig` objects
+- **Environment Management**: Seamless switching between test and live environments
+
+### **🔗 Payment Links Integration**
+- **Unified API**: Single `createPayLink` method for all payment link operations
+- **3-Step Process**: Authenticate → Create Link → Open Web View (same pattern as other payments)
+- **Image Support**: Optional custom images for payment links
+- **No Redirects**: Customers complete payments without returning to your app
+
+### **📱 Comprehensive Example App**
+- **Tabbed Interface**: Three organized tabs for different payment types
+- **Real-time Feedback**: Immediate success/error messages
+- **Modern UI**: Clean, responsive design with proper categorization
+- **Environment Switcher**: Easy testing between environments
+
+### **🏗️ Improved Architecture**
+- **Type Safety**: Consistent string typing throughout the codebase
+- **Error Handling**: Comprehensive exception handling and user feedback
+- **Clean Code**: SOLID principles and maintainable architecture
+- **Documentation**: Extensive inline documentation and examples
 
 ## 📊 Stats
 

@@ -4,7 +4,7 @@ class PaymentLinkRequest {
   final int amountCents;
   
   /// Payment methods (integration IDs)
-  final List<int> paymentMethods;
+  final List<String> paymentMethods;
   
   /// Customer email
   final String email;
@@ -42,7 +42,7 @@ class PaymentLinkRequest {
   /// Create PaymentLinkRequest from amount in currency units
   factory PaymentLinkRequest.fromAmount({
     required double amount,
-    required List<int> paymentMethods,
+    required List<String> paymentMethods,
     required String email,
     required String fullName,
     required String phoneNumber,

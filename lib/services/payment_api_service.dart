@@ -4,8 +4,6 @@ import 'dart:io';
 import '../core/constants/api_constants.dart';
 import '../core/exceptions/paymob_exceptions.dart';
 import '../core/interfaces/api_service_interface.dart';
-import '../models/auth_token_request.dart';
-import '../models/auth_token_response.dart';
 import '../models/billing_data.dart';
 import '../models/payment_link_request.dart';
 import '../models/payment_link_response.dart';
@@ -110,7 +108,7 @@ class PaymentApiService {
   /// Request wallet URL
   Future<String> requestPayUrl({
     required String paymentToken,
-    int? identifier,
+    String? identifier,
     String? subtype,
   }) async {
     try {

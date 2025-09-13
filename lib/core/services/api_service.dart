@@ -1,14 +1,16 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
+
 import '../constants/api_constants.dart';
 import '../exceptions/paymob_exceptions.dart';
 import '../interfaces/api_service_interface.dart';
 
 /// HTTP service implementation using Dio with logging
-class HttpService implements ApiServiceInterface {
+class ApiService implements ApiServiceInterface {
   late final Dio _dio;
 
-  HttpService() {
+  ApiService() {
     _dio = Dio();
     _setupInterceptors();
   }
@@ -27,12 +29,14 @@ class HttpService implements ApiServiceInterface {
           handler.next(options);
         },
         onResponse: (response, handler) {
-          print('✅ [RESPONSE] ${response.statusCode} ${response.requestOptions.uri}');
+          print(
+              '✅ [RESPONSE] ${response.statusCode} ${response.requestOptions.uri}');
           print('📄 [DATA] ${response.data}');
           handler.next(response);
         },
         onError: (error, handler) {
-          print('❌ [ERROR] ${error.response?.statusCode} ${error.requestOptions.uri}');
+          print(
+              '❌ [ERROR] ${error.response?.statusCode} ${error.requestOptions.uri}');
           print('💥 [ERROR MESSAGE] ${error.message}');
           if (error.response?.data != null) {
             print('📄 [ERROR DATA] ${error.response?.data}');
@@ -67,9 +71,10 @@ class HttpService implements ApiServiceInterface {
         path,
         data: data,
         queryParameters: queryParameters,
-        options: options ?? Options(
-          headers: ApiConstants.defaultHeaders,
-        ),
+        options: options ??
+            Options(
+              headers: ApiConstants.defaultHeaders,
+            ),
       );
       return response;
     } on DioException catch (e) {
@@ -87,9 +92,10 @@ class HttpService implements ApiServiceInterface {
       final response = await _dio.get<T>(
         path,
         queryParameters: queryParameters,
-        options: options ?? Options(
-          headers: ApiConstants.defaultHeaders,
-        ),
+        options: options ??
+            Options(
+              headers: ApiConstants.defaultHeaders,
+            ),
       );
       return response;
     } on DioException catch (e) {
@@ -108,14 +114,14 @@ class HttpService implements ApiServiceInterface {
     try {
       // Create FormData for multipart request
       final formData = FormData();
-      
+
       // Add fields
       if (fields != null) {
         fields.forEach((key, value) {
           formData.fields.add(MapEntry(key, value.toString()));
         });
       }
-      
+
       // Add files
       if (files != null) {
         files.forEach((key, value) {
@@ -135,12 +141,13 @@ class HttpService implements ApiServiceInterface {
         path,
         data: formData,
         queryParameters: queryParameters,
-        options: options ?? Options(
-          headers: {
-            ...ApiConstants.defaultHeaders,
-            'Content-Type': 'multipart/form-data',
-          },
-        ),
+        options: options ??
+            Options(
+              headers: {
+                ...ApiConstants.defaultHeaders,
+                'Content-Type': 'multipart/form-data',
+              },
+            ),
       );
       return response;
     } on DioException catch (e) {
@@ -164,22 +171,25 @@ class HttpService implements ApiServiceInterface {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return const ApiRequestException('Connection timeout. Please check your internet connection.');
-      
+        return const ApiRequestException(
+            'Connection timeout. Please check your internet connection.');
+
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        final message = error.response?.data?['message']?.toString() ?? 'API request failed';
+        final message = error.response?.data?['message']?.toString() ??
+            'API request failed';
         return ApiRequestException(message, statusCode?.toString());
-      
+
       case DioExceptionType.cancel:
         return const ApiRequestException('Request was cancelled');
-      
+
       case DioExceptionType.connectionError:
-        return const ApiRequestException('Connection error. Please check your internet connection.');
-      
+        return const ApiRequestException(
+            'Connection error. Please check your internet connection.');
+
       case DioExceptionType.badCertificate:
         return const ApiRequestException('SSL certificate error');
-      
+
       case DioExceptionType.unknown:
         return ApiRequestException('Unknown error: ${error.message}');
     }

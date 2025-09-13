@@ -5,8 +5,11 @@ class PaymentMethodConfig {
   /// The payment method
   final PaymobPaymentMethod paymentMethod;
   
-  /// The identifier for this payment method (also serves as integration ID)
-  final int identifier;
+  /// The identifier for this payment method (can be int or string)
+  final String identifier;
+  
+  /// Integration ID as string
+  final String integrationId;
   
   /// Custom subtype for this payment method
   final String customSubtype;
@@ -20,6 +23,7 @@ class PaymentMethodConfig {
   const PaymentMethodConfig({
     required this.paymentMethod,
     required this.identifier,
+    required this.integrationId,
     required this.customSubtype,
     required this.displayName,
     required this.description,
@@ -36,6 +40,7 @@ class PaymentMethodConfig {
     return other is PaymentMethodConfig &&
         other.paymentMethod == paymentMethod &&
         other.identifier == identifier &&
+        other.integrationId == integrationId &&
         other.customSubtype == customSubtype &&
         other.displayName == displayName &&
         other.description == description;
@@ -45,6 +50,7 @@ class PaymentMethodConfig {
   int get hashCode {
     return paymentMethod.hashCode ^
         identifier.hashCode ^
+        integrationId.hashCode ^
         customSubtype.hashCode ^
         displayName.hashCode ^
         description.hashCode;

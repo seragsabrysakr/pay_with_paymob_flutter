@@ -29,4 +29,9 @@ class PaymentPaymobResponse {
           : '',
     );
   }
+
+  @override
+  String toString() {
+    return 'PaymentPaymobResponse(success: $success, transactionID: $transactionID, responseCode: $responseCode, amountCents: $amountCents, message: $message, dataMessage: $dataMessage)';
+  }
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import '../../models/paymob_response.dart';
 
-class PaymobIFrameInApp extends StatefulWidget {
+class PaymobInAppWebView extends StatefulWidget {
   final String redirectURL;
   final Widget? title;
   final Color? appBarColor;
   final void Function(PaymentPaymobResponse)? onPayment;
 
-  const PaymobIFrameInApp({
+  const PaymobInAppWebView({
     Key? key,
     required this.redirectURL,
     this.onPayment,
@@ -26,7 +27,7 @@ class PaymobIFrameInApp extends StatefulWidget {
   }) =>
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => PaymobIFrameInApp(
+          builder: (context) => PaymobInAppWebView(
             redirectURL: redirectURL,
             title: title,
             appBarColor: appBarColor,
@@ -36,10 +37,10 @@ class PaymobIFrameInApp extends StatefulWidget {
       );
 
   @override
-  _PaymobIFrameInAppState createState() => _PaymobIFrameInAppState();
+  _PaymobInAppWebViewState createState() => _PaymobInAppWebViewState();
 }
 
-class _PaymobIFrameInAppState extends State<PaymobIFrameInApp> {
+class _PaymobInAppWebViewState extends State<PaymobInAppWebView> {
   late InAppWebViewController webViewController;
   bool isLoading = true;
 

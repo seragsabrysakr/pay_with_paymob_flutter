@@ -22,7 +22,8 @@ void main() {
         paymentMethods: [
           PaymentMethodConfig(
             paymentMethod: PaymobPaymentMethod.valu,
-            identifier: 123456,
+            identifier: '123456',
+            integrationId: '123456',
             customSubtype: 'VALU',
             displayName: 'ValU',
             description: 'Buy now, pay later with ValU',
@@ -47,7 +48,8 @@ void main() {
           paymentMethods: [
             PaymentMethodConfig(
               paymentMethod: PaymobPaymentMethod.valu,
-              identifier: 123456,
+              identifier: '123456',
+              integrationId: '123456',
               customSubtype: 'VALU',
               displayName: 'ValU',
               description: 'Buy now, pay later with ValU',
@@ -91,7 +93,8 @@ void main() {
           paymentMethods: [
             PaymentMethodConfig(
               paymentMethod: PaymobPaymentMethod.valu,
-              identifier: 123456,
+              identifier: '123456',
+              integrationId: '123456',
               customSubtype: 'VALU',
               displayName: 'ValU',
               description: 'Buy now, pay later with ValU',
@@ -108,14 +111,15 @@ void main() {
     test('should create configuration', () {
       final config = PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: 123456,
+        identifier: '123456',
+        integrationId: '123456',
         customSubtype: 'VALU',
         displayName: 'ValU',
         description: 'Buy now, pay later with ValU',
       );
 
       expect(config.paymentMethod, equals(PaymobPaymentMethod.valu));
-      expect(config.identifier, equals(123456));
+      expect(config.identifier, equals('123456'));
       expect(config.customSubtype, equals('VALU'));
       expect(config.displayName, equals('ValU'));
       expect(config.description, equals('Buy now, pay later with ValU'));
@@ -124,7 +128,8 @@ void main() {
     test('should support equality', () {
       final config1 = PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: 123456,
+        identifier: '123456',
+        integrationId: '123456',
         customSubtype: 'VALU',
         displayName: 'ValU',
         description: 'Buy now, pay later with ValU',
@@ -132,7 +137,8 @@ void main() {
 
       final config2 = PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: 123456,
+        identifier: '123456',
+        integrationId: '123456',
         customSubtype: 'VALU',
         displayName: 'ValU',
         description: 'Buy now, pay later with ValU',
