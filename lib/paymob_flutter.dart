@@ -23,7 +23,7 @@
 ///   
 ///   PaymobFlutter.instance.initialize(
 ///     apiKey: "your_api_key",
-///     paymentMethods: [PaymobPaymentMethod.valu],
+///     paymentMethods: [PaymentMethodConfig(...)],
 ///     iframes: [PaymobIframe(iframeId: 123, integrationId: 456)],
 ///   );
 ///   
@@ -36,7 +36,7 @@
 /// ```dart
 /// PaymobFlutter.instance.payWithCustomMethod(
 ///   context: context,
-///   paymentMethod: PaymobPaymentMethod.valu,
+///   paymentMethod: PaymentMethodConfig(...),
 ///   currency: "EGP",
 ///   amount: 100.0,
 ///   onPayment: (response) {
@@ -69,23 +69,27 @@
 library pay_with_paymob_flutter;
 
 import 'package:flutter/material.dart';
-import 'package:pay_with_paymob_flutter/core/interfaces/http_service_interface.dart';
+import 'package:pay_with_paymob_flutter/core/interfaces/api_service_interface.dart';
 import 'core/exceptions/paymob_exceptions.dart';
 import 'core/interfaces/payment_service_interface.dart';
-import 'core/services/http_service.dart';
+import 'core/services/api_service.dart';
 import 'models/billing_data.dart';
 import 'models/paymob_iframe_config.dart';
-import 'models/paymob_payment_method.dart';
 import 'models/paymob_response.dart';
+import 'models/payment_link_request.dart';
 import 'models/payment_method_config.dart';
 import 'services/payment_api_service.dart';
 import 'ui/widgets/paymob_iframe.dart';
 
 // Export all public classes
+export 'models/auth_token_request.dart';
+export 'models/auth_token_response.dart';
 export 'models/billing_data.dart';
 export 'models/paymob_iframe_config.dart';
 export 'models/paymob_payment_method.dart';
 export 'models/paymob_response.dart';
+export 'models/payment_link_request.dart';
+export 'models/payment_link_response.dart';
 export 'models/payment_method_config.dart';
 
 /// Main Paymob Flutter payment service
@@ -110,7 +114,6 @@ class PaymobFlutter implements PaymentServiceInterface {
   String? _apiKey;
   List<PaymentMethodConfig> _availablePaymentMethods = [];
   List<PaymobIframe> _availableIframes = [];
-  int? _defaultIntegrationId;
   int _userTokenExpiration = 3600;
   bool _isInitialized = false;
 
@@ -143,7 +146,6 @@ class PaymobFlutter implements PaymentServiceInterface {
     _apiKey = apiKey;
     _availablePaymentMethods = List.from(paymentMethods);
     _availableIframes = List.from(iframes);
-    _defaultIntegrationId = defaultIntegrationId ?? iframes.first.integrationId;
     _userTokenExpiration = userTokenExpiration;
 
     _isInitialized = true;
@@ -153,31 +155,20 @@ class PaymobFlutter implements PaymentServiceInterface {
   @override
   Future<bool> initialize({
     required String apiKey,
-    required List<PaymobPaymentMethod> paymentMethods,
+    required List<PaymentMethodConfig> paymentMethods,
     required List<PaymobIframe> iframes,
     int? defaultIntegrationId,
     int userTokenExpiration = 3600,
   }) async {
-    // Convert PaymobPaymentMethod list to PaymentMethodConfig list with default identifiers
-    final paymentMethodConfigs = paymentMethods
-        .map((method) => PaymentMethodConfig.withDefault(
-          paymentMethod: method, 
-          integrationId: defaultIntegrationId ?? iframes.first.integrationId,
-        ))
-        .toList();
-    
-    return initializeWithConfig(
-      apiKey: apiKey,
-      paymentMethods: paymentMethodConfigs,
-      iframes: iframes,
-      defaultIntegrationId: defaultIntegrationId,
-      userTokenExpiration: userTokenExpiration,
+    // This method is deprecated - use initializeWithConfig() instead
+    // You need to provide PaymentMethodConfig objects with identifiers
+    throw const PaymentInitializationException(
+      'Please use initializeWithConfig() method and provide PaymentMethodConfig objects with identifiers'
     );
   }
 
   @override
-  List<PaymobPaymentMethod> get availablePaymentMethods => 
-      _availablePaymentMethods.map((config) => config.paymentMethod).toList();
+  List<PaymentMethodConfig> get availablePaymentMethods => _availablePaymentMethods;
   
   /// Get available payment method configurations with their identifiers
   List<PaymentMethodConfig> get availablePaymentMethodConfigs => 
@@ -189,11 +180,9 @@ class PaymobFlutter implements PaymentServiceInterface {
   @override
   Future<void> payWithCustomMethod({
     required BuildContext context,
-    required PaymobPaymentMethod paymentMethod,
+    required PaymentMethodConfig paymentMethod,
     required String currency,
     required double amount,
-    String? identifier,
-    String? customSubtype,
     Widget? title,
     Color? appBarColor,
     void Function(PaymentPaymobResponse response)? onPayment,
@@ -204,29 +193,27 @@ class PaymobFlutter implements PaymentServiceInterface {
 
     try {
       // Get API key
-      await _paymentApiService.getApiKey(_apiKey!);
+      await _paymentApiService.getAuthenticationToken(_apiKey!);
       
       // Create order
       await _paymentApiService.createOrder(amount, currency);
       
       // Request payment token
-      final config = _getPaymentMethodConfig(paymentMethod);
-      final integrationId = config?.integrationId ?? _defaultIntegrationId!;
+      final integrationId = paymentMethod.identifier.toString();
       final paymentToken = await _paymentApiService.requestPaymentToken(
         amount: amount,
         currency: currency,
-        integrationId: integrationId.toString(),
+        integrationId: integrationId,
         billingData: billingData ?? BillingData(),
         userTokenExpiration: _userTokenExpiration,
       );
       
       // Request wallet URL
-      final subtype = customSubtype ?? config?.customSubtype ?? paymentMethod.subtype;
-      final finalIdentifier = integrationId.toString();
+
       final payUrl = await _paymentApiService.requestPayUrl(
         paymentToken: paymentToken,
-        identifier: finalIdentifier,
-        subtype: subtype,
+        identifier: paymentMethod.identifier,
+        subtype: paymentMethod.customSubtype,
       );
       debugPrint('walletUrl: $payUrl');
       // Show payment interface
@@ -265,7 +252,7 @@ class PaymobFlutter implements PaymentServiceInterface {
 
     try {
       // Get API key
-      await _paymentApiService.getApiKey(_apiKey!);
+      await _paymentApiService.getAuthenticationToken(_apiKey!);
       
       // Create order
       await _paymentApiService.createOrder(amount, currency);
@@ -310,21 +297,13 @@ class PaymobFlutter implements PaymentServiceInterface {
   }
 
   /// Validate that the payment method is available
-  void _validatePaymentMethod(PaymobPaymentMethod paymentMethod) {
-    if (!_availablePaymentMethods.any((config) => config.paymentMethod == paymentMethod)) {
-      final availableNames = _availablePaymentMethods.map((config) => config.paymentMethod.displayName).toList();
+  void _validatePaymentMethod(PaymentMethodConfig paymentMethod) {
+    if (!_availablePaymentMethods.contains(paymentMethod)) {
+      final availableNames = _availablePaymentMethods.map((config) => config.displayName).toList();
       throw PaymentMethodNotAvailableException(paymentMethod.displayName, availableNames);
     }
   }
   
-  /// Get the payment method configuration for a given payment method
-  PaymentMethodConfig? _getPaymentMethodConfig(PaymobPaymentMethod paymentMethod) {
-    try {
-      return _availablePaymentMethods.firstWhere((config) => config.paymentMethod == paymentMethod);
-    } catch (e) {
-      return null;
-    }
-  }
 
   /// Validate that the iframe is available
   void _validateIframe(PaymobIframe iframe) {
@@ -332,5 +311,48 @@ class PaymobFlutter implements PaymentServiceInterface {
       final availableNames = _availableIframes.map((i) => i.name ?? i.iframeId.toString()).toList();
       throw IframeNotAvailableException(iframe.name ?? iframe.iframeId.toString(), availableNames);
     }
+  }
+
+  /// Create and open payment link (same pattern as other payment methods)
+  Future<void> createPayLink({
+    required BuildContext context,
+    required String apiKey,
+    required PaymentLinkRequest request,
+    String? imagePath,
+    Widget? title,
+    Color? appBarColor,
+    void Function(PaymentPaymobResponse response)? onPayment,
+  }) async {
+    _validateInitialization();
+
+    try {
+      // Step 1: Get token (same as other payment methods)
+      await _paymentApiService.getAuthenticationToken(apiKey);
+      
+      // Step 2: Create payment link
+      final paymentLinkResponse = await _paymentApiService.createPaymentLink(
+        request: request,
+        imagePath: imagePath,
+      );
+      
+      // Step 3: Open as web view (same way as other payment methods)
+      if (context.mounted) {
+        await PaymobIFrameInApp.show(
+          context: context,
+          redirectURL: paymentLinkResponse.clientUrl,
+          title: title ?? const Text('Payment Link'),
+          appBarColor: appBarColor,
+          onPayment: onPayment,
+        );
+      }
+    } catch (e) {
+      _paymentApiService.clearAuth();
+      rethrow;
+    }
+  }
+
+  /// Clear payment link authentication
+  void clearPaymentLinkAuth() {
+    _paymentApiService.clearAuth();
   }
 }

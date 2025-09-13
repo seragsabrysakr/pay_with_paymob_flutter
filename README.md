@@ -15,6 +15,7 @@ A powerful, feature-rich Flutter package that provides seamless integration with
 - **🌍 Multi-Environment Support** - Separate configurations for test and live environments
 - **💳 Multiple Payment Methods** - Support for all Paymob payment methods
 - **🖼️ Iframe Integration** - Built-in iframe support for web-based payments
+- **🔗 Payment Links** - Create shareable payment links for seamless customer experience
 - **🔒 Secure** - Follows security best practices and Paymob guidelines
 - **📱 Cross-Platform** - Works on iOS, Android, Web, and Desktop
 
@@ -118,8 +119,9 @@ class TestConfig {
   static AppConfig get config => AppConfig(
     apiKey: "test_api_key",
     paymentMethods: [
-      PaymentMethodConfig.withDefault(
+      PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
+        identifier: "01010101010", // Phone number for ValU
         integrationId: 123456,
       ),
     ],
@@ -133,7 +135,7 @@ class LiveConfig {
   static AppConfig get config => AppConfig(
     apiKey: "live_api_key",
     paymentMethods: [
-      PaymentMethodConfig.custom(
+      PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
         identifier: "customer_phone",
         integrationId: 789012,
@@ -215,6 +217,61 @@ PaymobFlutter.instance.payWithIframe(
 );
 ```
 
+### **Payment Links** 🆕
+
+Create shareable payment links that customers can use to complete payments without being redirected back to your app.
+
+```dart
+// Create a payment link using API key (recommended)
+final request = PaymentLinkRequest.fromAmount(
+  amount: 100.0, // Amount in currency units
+  paymentMethods: ["123456"], // Integration IDs
+  email: "customer@example.com",
+  fullName: "John Doe",
+  phoneNumber: "+201029382968",
+  description: "Payment for order #12345",
+  isLive: true, // Set to false for test environment
+);
+
+await PaymobFlutter.instance.createPayLink(
+  context: context,
+  apiKey: "your_api_key", // Your PayMob API key
+  request: request,
+  imagePath: "/path/to/payment/image.png", // Optional
+  title: const Text('Payment Link'),
+  onPayment: (response) {
+    // Handle payment response
+    if (response.success) {
+      print('Payment successful!');
+    } else {
+      print('Payment failed: ${response.message}');
+    }
+  },
+);
+```
+
+**Payment Link Features:**
+- ✅ **Shareable Links** - Send payment links via SMS, email, or any messaging platform
+- ✅ **No Redirects** - Customers complete payment without returning to your app
+- ✅ **Image Support** - Add custom images to payment links
+- ✅ **Multiple Payment Methods** - Support for various payment options
+- ✅ **Reference Tracking** - Track payments with custom reference IDs
+- ✅ **Environment Support** - Works with both test and live environments
+- ✅ **Unified Service** - All payment operations (regular payments + payment links) in one service
+
+**Simple Usage:**
+```dart
+// Create and open payment link (same pattern as other payment methods)
+await PaymobFlutter.instance.createPayLink(
+  context: context,
+  apiKey: "your_api_key",
+  request: request,
+  onPayment: (response) {
+    // Handle payment response
+  },
+);
+```
+
 ## 🎨 UI Components
 
 ### **Payment Method Selection**
@@ -253,7 +310,7 @@ Container(
 ### **Payment Method Configuration**
 
 ```dart
-PaymentMethodConfig.custom(
+PaymentMethodConfig(
   paymentMethod: PaymobPaymentMethod.valu,
   identifier: "customer_identifier",
   integrationId: 123456,

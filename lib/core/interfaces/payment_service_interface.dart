@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../models/billing_data.dart';
 import '../../models/paymob_iframe_config.dart';
-import '../../models/paymob_payment_method.dart';
+import '../../models/payment_method_config.dart';
 import '../../models/paymob_response.dart';
+import '../../models/payment_link_request.dart';
 
 /// Interface for payment service operations
 abstract class PaymentServiceInterface {
   /// Initialize the payment service
   Future<bool> initialize({
     required String apiKey,
-    required List<PaymobPaymentMethod> paymentMethods,
+    required List<PaymentMethodConfig> paymentMethods,
     required List<PaymobIframe> iframes,
     int? defaultIntegrationId,
     int userTokenExpiration,
@@ -18,11 +19,11 @@ abstract class PaymentServiceInterface {
   /// Pay using a custom payment method
   Future<void> payWithCustomMethod({
     required BuildContext context,
-    required PaymobPaymentMethod paymentMethod,
+    required PaymentMethodConfig paymentMethod,
     required String currency,
     required double amount,
-    String? identifier,
-    String? customSubtype,
+  
+ 
     Widget? title,
     Color? appBarColor,
     void Function(PaymentPaymobResponse response)? onPayment,
@@ -40,10 +41,22 @@ abstract class PaymentServiceInterface {
     void Function(PaymentPaymobResponse response)? onPayment,
     BillingData? billingData,
   });
+    /// Create and open payment link (same pattern as other payment methods)
+  Future<void> createPayLink({
+    required BuildContext context,
+    required String apiKey,
+    required PaymentLinkRequest request,
+    String? imagePath,
+    Widget? title,
+    Color? appBarColor,
+    void Function(PaymentPaymobResponse response)? onPayment,
+  });
 
   /// Get available payment methods
-  List<PaymobPaymentMethod> get availablePaymentMethods;
+  List<PaymentMethodConfig> get availablePaymentMethods;
 
   /// Get available iframes
   List<PaymobIframe> get availableIframes;
+
+
 }

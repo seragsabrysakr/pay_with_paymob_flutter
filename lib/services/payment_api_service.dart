@@ -1,9 +1,14 @@
 import 'dart:developer';
+import 'dart:io';
 
 import '../core/constants/api_constants.dart';
 import '../core/exceptions/paymob_exceptions.dart';
-import '../core/interfaces/http_service_interface.dart';
+import '../core/interfaces/api_service_interface.dart';
+import '../models/auth_token_request.dart';
+import '../models/auth_token_response.dart';
 import '../models/billing_data.dart';
+import '../models/payment_link_request.dart';
+import '../models/payment_link_response.dart';
 
 /// Service for handling payment API operations
 class PaymentApiService {
@@ -14,7 +19,7 @@ class PaymentApiService {
   PaymentApiService(this._apiService);
 
   /// Get API authentication token
-  Future<String> getApiKey(String apiKey) async {
+  Future<String> getAuthenticationToken(String apiKey) async {
     try {
       final response = await _apiService.post<Map<String, dynamic>>(
         ApiConstants.authorization,
@@ -105,7 +110,7 @@ class PaymentApiService {
   /// Request wallet URL
   Future<String> requestPayUrl({
     required String paymentToken,
-    String? identifier,
+    int? identifier,
     String? subtype,
   }) async {
     try {
@@ -152,6 +157,57 @@ log('response: $response');
     }
   }
 
+  
+
+  /// Create a payment link
+  Future<PaymentLinkResponse> createPaymentLink({
+    required PaymentLinkRequest request,
+    String? imagePath,
+  }) async {
+    if (_authToken == null) {
+      throw const PaymentInitializationException('Authentication token not available. Please authenticate first.');
+    }
+
+    try {
+      // Prepare form data
+      final formData = request.toFormData();
+
+      // Add image file if provided
+      Map<String, dynamic>? files;
+      if (imagePath != null && imagePath.isNotEmpty) {
+        final file = File(imagePath);
+        if (await file.exists()) {
+          files = {
+            'payment_link_image': file,
+          };
+        }
+      }
+
+      log('Creating payment link with data: $formData');
+      
+      final response = await _apiService.postMultipart<Map<String, dynamic>>(
+        ApiConstants.paymentLinks,
+        fields: formData,
+        files: files,
+      );
+
+      log('Payment link response: $response');
+
+      if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
+        return PaymentLinkResponse.fromJson(response.data!);
+      } else {
+        throw const PaymentLinkException('Failed to create payment link');
+      }
+    } catch (e) {
+      if (e is PaymobException) rethrow;
+      log('Error creating payment link: $e');
+      throw const PaymentLinkException('Failed to create payment link');
+    }
+  }
+
+ 
+
+  
   /// Clear authentication data
   void clearAuth() {
     _authToken = null;

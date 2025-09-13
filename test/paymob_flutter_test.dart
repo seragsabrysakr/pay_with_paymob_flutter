@@ -19,7 +19,15 @@ void main() {
     test('should initialize with valid configuration', () async {
       final result = await paymobFlutter.initialize(
         apiKey: "test_api_key",
-        paymentMethods: [PaymobPaymentMethod.valu],
+        paymentMethods: [
+          PaymentMethodConfig(
+            paymentMethod: PaymobPaymentMethod.valu,
+            identifier: 123456,
+            customSubtype: 'VALU',
+            displayName: 'ValU',
+            description: 'Buy now, pay later with ValU',
+          ),
+        ],
         iframes: [
           PaymobIframe(
             iframeId: 123456,
@@ -36,7 +44,15 @@ void main() {
       expect(
         () async => await paymobFlutter.initialize(
           apiKey: "",
-          paymentMethods: [PaymobPaymentMethod.valu],
+          paymentMethods: [
+            PaymentMethodConfig(
+              paymentMethod: PaymobPaymentMethod.valu,
+              identifier: 123456,
+              customSubtype: 'VALU',
+              displayName: 'ValU',
+              description: 'Buy now, pay later with ValU',
+            ),
+          ],
           iframes: [
             PaymobIframe(
               iframeId: 123456,
@@ -72,7 +88,15 @@ void main() {
       expect(
         () async => await paymobFlutter.initialize(
           apiKey: "test_api_key",
-          paymentMethods: [PaymobPaymentMethod.valu],
+          paymentMethods: [
+            PaymentMethodConfig(
+              paymentMethod: PaymobPaymentMethod.valu,
+              identifier: 123456,
+              customSubtype: 'VALU',
+              displayName: 'ValU',
+              description: 'Buy now, pay later with ValU',
+            ),
+          ],
           iframes: [],
         ),
         throwsA(isA<PaymentInitializationException>()),
@@ -81,40 +105,37 @@ void main() {
   });
 
   group('PaymentMethodConfig Tests', () {
-    test('should create custom configuration', () {
-      final config = PaymentMethodConfig.custom(
+    test('should create configuration', () {
+      final config = PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: "test_identifier",
-        integrationId: 123456,
+        identifier: 123456,
+        customSubtype: 'VALU',
+        displayName: 'ValU',
+        description: 'Buy now, pay later with ValU',
       );
 
       expect(config.paymentMethod, equals(PaymobPaymentMethod.valu));
-      expect(config.identifier, equals("test_identifier"));
-      expect(config.integrationId, equals(123456));
-    });
-
-    test('should create default configuration', () {
-      final config = PaymentMethodConfig.withDefault(
-        paymentMethod: PaymobPaymentMethod.valu,
-        integrationId: 123456,
-      );
-
-      expect(config.paymentMethod, equals(PaymobPaymentMethod.valu));
-      expect(config.identifier, equals(PaymobPaymentMethod.valu.defaultIdentifier));
-      expect(config.integrationId, equals(123456));
+      expect(config.identifier, equals(123456));
+      expect(config.customSubtype, equals('VALU'));
+      expect(config.displayName, equals('ValU'));
+      expect(config.description, equals('Buy now, pay later with ValU'));
     });
 
     test('should support equality', () {
-      final config1 = PaymentMethodConfig.custom(
+      final config1 = PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: "test_identifier",
-        integrationId: 123456,
+        identifier: 123456,
+        customSubtype: 'VALU',
+        displayName: 'ValU',
+        description: 'Buy now, pay later with ValU',
       );
 
-      final config2 = PaymentMethodConfig.custom(
+      final config2 = PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        identifier: "test_identifier",
-        integrationId: 123456,
+        identifier: 123456,
+        customSubtype: 'VALU',
+        displayName: 'ValU',
+        description: 'Buy now, pay later with ValU',
       );
 
       expect(config1, equals(config2));
@@ -122,37 +143,6 @@ void main() {
     });
   });
 
-  group('PaymobPaymentMethod Tests', () {
-    test('should have correct identifiers', () {
-      expect(PaymobPaymentMethod.applePay.identifier, equals('APPLE_PAY'));
-      expect(PaymobPaymentMethod.valu.identifier, equals('VALU'));
-      expect(PaymobPaymentMethod.wallet.identifier, equals('WALLET'));
-    });
-
-    test('should have correct subtypes', () {
-      expect(PaymobPaymentMethod.applePay.subtype, equals('APPLE_PAY'));
-      expect(PaymobPaymentMethod.valu.subtype, equals('VALU'));
-      expect(PaymobPaymentMethod.wallet.subtype, equals('WALLET'));
-    });
-
-    test('should have correct display names', () {
-      expect(PaymobPaymentMethod.applePay.displayName, equals('Apple Pay'));
-      expect(PaymobPaymentMethod.valu.displayName, equals('ValU'));
-      expect(PaymobPaymentMethod.wallet.displayName, equals('Wallet'));
-    });
-
-    test('should have correct descriptions', () {
-      expect(PaymobPaymentMethod.applePay.description, equals('Pay securely with Apple Pay'));
-      expect(PaymobPaymentMethod.valu.description, equals('Buy now, pay later with ValU'));
-      expect(PaymobPaymentMethod.wallet.description, equals('Digital wallet payment'));
-    });
-
-    test('should have correct default identifiers', () {
-      expect(PaymobPaymentMethod.applePay.defaultIdentifier, equals('user@example.com'));
-      expect(PaymobPaymentMethod.valu.defaultIdentifier, equals('01010101010'));
-      expect(PaymobPaymentMethod.wallet.defaultIdentifier, equals('wallet_user_001'));
-    });
-  });
 
   group('BillingData Tests', () {
     test('should create billing data with all fields', () {

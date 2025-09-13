@@ -1,7 +1,8 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../constants/api_constants.dart';
 import '../exceptions/paymob_exceptions.dart';
-import '../interfaces/http_service_interface.dart';
+import '../interfaces/api_service_interface.dart';
 
 /// HTTP service implementation using Dio with logging
 class HttpService implements ApiServiceInterface {
@@ -88,6 +89,57 @@ class HttpService implements ApiServiceInterface {
         queryParameters: queryParameters,
         options: options ?? Options(
           headers: ApiConstants.defaultHeaders,
+        ),
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<Response<T>> postMultipart<T>(
+    String path, {
+    Map<String, dynamic>? fields,
+    Map<String, dynamic>? files,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      // Create FormData for multipart request
+      final formData = FormData();
+      
+      // Add fields
+      if (fields != null) {
+        fields.forEach((key, value) {
+          formData.fields.add(MapEntry(key, value.toString()));
+        });
+      }
+      
+      // Add files
+      if (files != null) {
+        files.forEach((key, value) {
+          if (value is File) {
+            formData.files.add(MapEntry(
+              key,
+              MultipartFile.fromFileSync(
+                value.path,
+                filename: value.path.split('/').last,
+              ),
+            ));
+          }
+        });
+      }
+
+      final response = await _dio.post<T>(
+        path,
+        data: formData,
+        queryParameters: queryParameters,
+        options: options ?? Options(
+          headers: {
+            ...ApiConstants.defaultHeaders,
+            'Content-Type': 'multipart/form-data',
+          },
         ),
       );
       return response;

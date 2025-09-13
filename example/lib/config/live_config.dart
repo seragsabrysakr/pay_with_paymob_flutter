@@ -7,65 +7,96 @@ class LiveConfig {
      apiKey: "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T0RNMU1ERXlMQ0p1WVcxbElqb2lNVFk0T0RrNU9USXdOQzR3TURrNE5ETWlmUS5fX1dORVJNb3h3enBkeFZycjBmX0dXRWNkQnFuSUU0MFRPVElhSkl1LVQ1eXZKRXpFWnFXQngtTWd5T2t1TElaMkJJckg2ZkZ2SWpEb3kwbm13UHc0Zw==",
     
     paymentMethods: [
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
+        paymentMethod: PaymobPaymentMethod.custom,
+        identifier: 4029829, // Integration ID for Apple Pay
+        customSubtype: 'card',
+        displayName: 'OnLine Card',
+        description: 'Pay securely with OnLine Card',
+      ),
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.applePay,
-        integrationId: 4833395, // Live Integration ID for Apple Pay (Online Card)
+        identifier: 4833395, // Live Integration ID for Apple Pay (Online Card)
+        customSubtype: "APPLE_PAY",
+        displayName: "Apple Pay",
+        description: "Pay securely with Apple Pay",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        integrationId: 5265795, // Live Integration ID for ValU
+        identifier: 5265795, // Live Integration ID for ValU
+        customSubtype: "VALU",
+        displayName: "ValU",
+        description: "Buy now, pay later with ValU",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.bankInstallments,
-        integrationId: 5090202, // Live Integration ID for bank installments (MID_TAKSEET)
+        identifier:4036625 , // Live Integration ID for bank installments (MID_TAKSEET)
+        customSubtype: "BANK_INSTALLMENTS",
+        displayName: "Bank Installments",
+        description: "Pay in installments with your bank",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.souhoolaV3,
-        integrationId: 4320916, // Live Integration ID for Souhoola (HOST)
+        identifier: 4320916, // Live Integration ID for Souhoola (HOST)
+        customSubtype: "SOUHOOLA_V3",
+        displayName: "Souhoola V3",
+        description: "Souhoola V3 payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.amanV3,
-        integrationId: 4955437, // Live Integration ID for Aman (AMANV3)
+        identifier: 4955437, // Live Integration ID for Aman (AMANV3)
+        customSubtype: "AMAN_V3",
+        displayName: "Aman V3",
+        description: "Aman V3 payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.forsa,
-        integrationId: 4028165, // Live Integration ID for Forsa (HOST)
+        identifier: 4028165, // Live Integration ID for Forsa (HOST)
+        customSubtype: "FORSA",
+        displayName: "Forsa",
+        description: "Forsa payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.premium,
-        integrationId: 4609366, // Live Integration ID for Premium (HOST)
+        identifier: 4609366, // Live Integration ID for Premium (HOST)
+        customSubtype: "PREMIUM",
+        displayName: "Premium",
+        description: "Premium payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.contact,
-        integrationId: 5005227, // Live Integration ID for Contact (HOST)
+        identifier: 5005227, // Live Integration ID for Contact (HOST)
+        customSubtype: "CONTACT",
+        displayName: "Contact",
+        description: "Contact payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.halan,
-        integrationId: 4626046, // Live Integration ID for HALAN (SUBSCRIPTION)
+        identifier: 4626046, // Live Integration ID for HALAN (SUBSCRIPTION)
+        customSubtype: "HALAN",
+        displayName: "HALAN",
+        description: "HALAN payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.sympl,
-        integrationId: 5186925, // Live Integration ID for SYMPL (valU)
+        identifier: 5186925, // Live Integration ID for SYMPL (valU)
+        customSubtype: "SYMPL",
+        displayName: "SYMPL",
+        description: "SYMPL payment service",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.kiosk,
-        integrationId: 4833395, // Live Integration ID for Kiosk (Online Card)
+        identifier: 4833395, // Live Integration ID for Kiosk (Online Card)
+        customSubtype: "kiosk",
+        displayName: "Kiosk",
+        description: "Pay at kiosk locations",
       ),
-      PaymentMethodConfig.custom(
-        identifier: "",
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.wallet,
-        integrationId: 4037352, // Live Integration ID for Wallet (valU)
+        identifier: 4037352, // Live Integration ID for Wallet (valU)
+        customSubtype: "WALLET",
+        displayName: "Wallet",
+        description: "Digital wallet payment",
       ),
     ],
     

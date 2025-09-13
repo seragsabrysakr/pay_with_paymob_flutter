@@ -7,53 +7,96 @@ class TestConfig {
     apiKey: "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T0RNMU1ERXlMQ0p1WVcxbElqb2lNVFk0T0RrNU9USXdOQzR3TURrNE5ETWlmUS5fX1dORVJNb3h3enBkeFZycjBmX0dXRWNkQnFuSUU0MFRPVElhSkl1LVQ1eXZKRXpFWnFXQngtTWd5T2t1TElaMkJJckg2ZkZ2SWpEb3kwbm13UHc0Zw==",
     
     paymentMethods: [
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
+        paymentMethod: PaymobPaymentMethod.custom,
+        identifier: 3958578, // Integration ID for Apple Pay
+        customSubtype: 'card',
+        displayName: 'OnLine Card',
+        description: 'Pay securely with OnLine Card',
+      ),
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.applePay,
-        integrationId: 3958578, // Integration ID for Apple Pay
+        identifier: 3958578, // Integration ID for Apple Pay
+        customSubtype: 'APPLE_PAY',
+        displayName: 'Apple Pay',
+        description: 'Pay securely with Apple Pay',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.valu,
-        integrationId: 3958485, // Integration ID for ValU
+        identifier: 3958485, // Integration ID for ValU
+        customSubtype: 'VALU',
+        displayName: 'ValU',
+        description: 'Buy now, pay later with ValU',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.bankInstallments,
-        integrationId: 3958578, // Integration ID for bank installments
+        identifier: 3958578, // Integration ID for bank installments
+        customSubtype: 'BANK_INSTALLMENTS',
+        displayName: 'Bank Installments',
+        description: 'Pay in installments with your bank',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.souhoolaV3,
-        integrationId: 123456, // Integration ID for Souhoola
+        identifier: 123456, // Integration ID for Souhoola
+        customSubtype: 'SOUHOOLA_V3',
+        displayName: 'Souhoola V3',
+        description: 'Souhoola V3 payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.amanV3,
-        integrationId: 123456, // Integration ID for Aman
+        identifier: 123456, // Integration ID for Aman
+        customSubtype: 'AMAN_V3',
+        displayName: 'Aman V3',
+        description: 'Aman V3 payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.forsa,
-        integrationId: 123456, // Integration ID for Forsa
+        identifier: 123456, // Integration ID for Forsa
+        customSubtype: 'FORSA',
+        displayName: 'Forsa',
+        description: 'Forsa payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.premium,
-        integrationId: 123456, // Integration ID for Premium
+        identifier: 123456, // Integration ID for Premium
+        customSubtype: 'PREMIUM',
+        displayName: 'Premium',
+        description: 'Premium payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.contact,
-        integrationId: 123456, // Integration ID for Contact
+        identifier: 123456, // Integration ID for Contact
+        customSubtype: 'CONTACT',
+        displayName: 'Contact',
+        description: 'Contact payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.halan,
-        integrationId: 123456, // Integration ID for HALAN
+        identifier: 123456, // Integration ID for HALAN
+        customSubtype: 'HALAN',
+        displayName: 'HALAN',
+        description: 'HALAN payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.sympl,
-        integrationId: 123456, // Integration ID for SYMPL
+        identifier: 123456, // Integration ID for SYMPL
+        customSubtype: 'SYMPL',
+        displayName: 'SYMPL',
+        description: 'SYMPL payment service',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.kiosk,
-        integrationId: 123456, // Integration ID for Kiosk
+        identifier: 123456, // Integration ID for Kiosk
+        customSubtype: 'kiosk',
+        displayName: 'Kiosk',
+        description: 'Pay at kiosk locations',
       ),
-      PaymentMethodConfig.withDefault(
+      const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.wallet,
-        integrationId: 5274118, // Integration ID for Wallet
+        identifier: 5274118, // Integration ID for Wallet
+        customSubtype: 'WALLET',
+        displayName: 'Wallet',
+        description: 'Digital wallet payment',
       ),
     ],
     

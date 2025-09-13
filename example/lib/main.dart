@@ -49,19 +49,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Widget _buildPaymentMethodCard(PaymobPaymentMethod method) {
-    // Get the configuration for this payment method
-    final config = PaymobFlutter.instance.availablePaymentMethodConfigs
-        .firstWhere((config) => config.paymentMethod == method);
+  Widget _buildPaymentMethodCard(PaymentMethodConfig config) {
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 2),
       child: ListTile(
-        title: Text(method.displayName),
+        title: Text(config.displayName),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(method.description),
+            Text(config.description),
             const SizedBox(height: 4),
             Text(
               "Identifier: ${config.identifier}",
@@ -72,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Text(
-              "Integration ID: ${config.integrationId}",
+              "Integration ID: ${config.identifier}",
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.blue,
@@ -82,46 +79,86 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         trailing: ElevatedButton(
-          onPressed: () {
-            // Now you can call payWithCustomMethod without specifying identifier
-            // The system will automatically use the configured identifier from initialization
-            PaymobFlutter.instance.payWithCustomMethod(
-              context: context,
-              paymentMethod: method,
-              currency: "EGP",
-              amount: 100,
-              billingData: BillingData(
-                firstName: "John",
-                lastName: "Doe",
-                email: "john.doe@example.com",
-                phoneNumber: "01010101010",
-                apartment: "123",
-                building: "123",
-                postalCode: "12345",
-                city: "Anytown",
-                state: "CA",
-                country: "USA",
-                floor: "1",
-                street: "123 Main St",
-                shippingMethod: "Standard",
-              ),
-              // identifier is now optional - will use the configured identifier from initialization
-              // identifier: "custom_identifier", // You can still override with custom identifier
-              onPayment: (response) {
-                response.success == true
-                    ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "${method.displayName} Payment: ${response.message ?? "Success"}")))
-                    : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "${method.displayName} Payment: ${response.message ?? "Failed"}")));
-              },
-            );
+          onPressed: ()async {
+          await _createPaymentLink(config);
           },
           child: const Text("Pay"),
         ),
       ),
     );
+  }
+
+  Future<void> _createPaymentLink(PaymentMethodConfig method) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Get the first available integration ID for payment methods
+      
+       // Create payment link request
+      PaymentLinkRequest request = PaymentLinkRequest.fromAmount(
+        amount: 1.0,  
+        paymentMethods: [method.identifier], // Use the first available integration ID
+        email: "customer@example.com",
+        fullName: "John Doe",
+        phoneNumber: "+201029382968",
+        description: "Test payment link from Flutter app",
+        isLive: ConfigManager.isLive, // Use current environment setting
+      );
+
+      // Create and open payment link (same pattern as other payment methods)
+      final config = ConfigManager.currentConfig;
+      await PaymobFlutter.instance.createPayLink(
+        context: context,
+        apiKey: config.apiKey, // Use the same API key from your config
+        request: request,
+        title: const Text('Payment Link'),
+        onPayment: (response) {
+          // Handle payment response
+          if (response.success) {
+            // need to show the message 
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message ?? "Success")));
+            Navigator.of(context).pop();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message ?? "Failed")));
+            Navigator.of(context).pop();
+          }
+        },
+      );
+
+      // Close loading dialog
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Show error dialog
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Error"),
+            content: Text("Failed to create payment link: $e"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -183,8 +220,8 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 10),
               const Text(
-                "Choose from the available payment methods and iframes below:",
-                style: TextStyle(fontSize: 14),
+                "Create Payment Link:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -199,11 +236,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 5),
               ...PaymobFlutter.instance.availablePaymentMethods
-                  .where((method) => [
+                  .where((config) => [
+                        PaymobPaymentMethod.custom,
                         PaymobPaymentMethod.applePay,
                         PaymobPaymentMethod.wallet
-                      ].contains(method))
-                  .map((method) => _buildPaymentMethodCard(method)),
+                      ].contains(config.paymentMethod))
+                  .map((config) => _buildPaymentMethodCard(config)),
               const SizedBox(height: 10),
               // Installment Services
               const Text(
@@ -212,15 +250,15 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 5),
               ...PaymobFlutter.instance.availablePaymentMethods
-                  .where((method) => [
+                  .where((config) => [
                         PaymobPaymentMethod.valu,
                         PaymobPaymentMethod.bankInstallments,
                         PaymobPaymentMethod.souhoolaV3,
                         PaymobPaymentMethod.amanV3,
                         PaymobPaymentMethod.forsa,
                         PaymobPaymentMethod.premium
-                      ].contains(method))
-                  .map((method) => _buildPaymentMethodCard(method)),
+                      ].contains(config.paymentMethod))
+                  .map((config) => _buildPaymentMethodCard(config)),
               const SizedBox(height: 10),
               // Other Services
               const Text(
@@ -229,14 +267,15 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 5),
               ...PaymobFlutter.instance.availablePaymentMethods
-                  .where((method) => [
+                  .where((config) => [
                         PaymobPaymentMethod.contact,
                         PaymobPaymentMethod.halan,
                         PaymobPaymentMethod.sympl,
                         PaymobPaymentMethod.kiosk,
                         PaymobPaymentMethod.custom
-                      ].contains(method))
-                  .map((method) => _buildPaymentMethodCard(method)),
+                      ].contains(config.paymentMethod))
+                  .map((config) => _buildPaymentMethodCard(config)),
+            
               const SizedBox(height: 20),
               const Text(
                 "Available Iframes:",

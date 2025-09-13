@@ -55,3 +55,9 @@ class WalletUrlException extends PaymobException {
   const WalletUrlException([String? message]) 
       : super(message ?? 'Failed to get wallet URL');
 }
+
+/// Exception thrown when payment link operations fail
+class PaymentLinkException extends PaymobException {
+  const PaymentLinkException([String? message]) 
+      : super(message ?? 'Failed to process payment link');
+}

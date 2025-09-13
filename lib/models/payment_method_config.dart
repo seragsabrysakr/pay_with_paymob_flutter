@@ -5,70 +5,29 @@ class PaymentMethodConfig {
   /// The payment method
   final PaymobPaymentMethod paymentMethod;
   
-  /// The identifier for this payment method
-  final String identifier;
+  /// The identifier for this payment method (also serves as integration ID)
+  final int identifier;
   
-  /// The integration ID for this payment method
-  final int integrationId;
+  /// Custom subtype for this payment method
+  final String customSubtype;
   
-  /// Optional custom subtype for this payment method
-  final String? customSubtype;
+  /// Display name for this payment method
+  final String displayName;
   
-  /// Optional display name override
-  final String? displayName;
-  
-  /// Optional description override
-  final String? description;
+  /// Description for this payment method
+  final String description;
 
   const PaymentMethodConfig({
     required this.paymentMethod,
     required this.identifier,
-    required this.integrationId,
-    this.customSubtype,
-    this.displayName,
-    this.description,
+    required this.customSubtype,
+    required this.displayName,
+    required this.description,
   });
-
-  /// Create a PaymentMethodConfig with default identifier
-  factory PaymentMethodConfig.withDefault({
-    required PaymobPaymentMethod paymentMethod,
-    required int integrationId,
-    String? customSubtype,
-    String? displayName,
-    String? description,
-  }) {
-    return PaymentMethodConfig(
-      paymentMethod: paymentMethod,
-      identifier: paymentMethod.defaultIdentifier,
-      integrationId: integrationId,
-      customSubtype: customSubtype,
-      displayName: displayName,
-      description: description,
-    );
-  }
-
-  /// Create a PaymentMethodConfig with custom identifier
-  factory PaymentMethodConfig.custom({
-    required PaymobPaymentMethod paymentMethod,
-    required String identifier,
-    required int integrationId,
-    String? customSubtype,
-    String? displayName,
-    String? description,
-  }) {
-    return PaymentMethodConfig(
-      paymentMethod: paymentMethod,
-      identifier: identifier,
-      integrationId: integrationId,
-      customSubtype: customSubtype,
-      displayName: displayName,
-      description: description,
-    );
-  }
 
   @override
   String toString() {
-    return 'PaymentMethodConfig(paymentMethod: $paymentMethod, identifier: $identifier, integrationId: $integrationId)';
+    return 'PaymentMethodConfig(paymentMethod: $paymentMethod, identifier: $identifier, customSubtype: $customSubtype)';
   }
 
   @override
@@ -77,15 +36,17 @@ class PaymentMethodConfig {
     return other is PaymentMethodConfig &&
         other.paymentMethod == paymentMethod &&
         other.identifier == identifier &&
-        other.integrationId == integrationId &&
-        other.customSubtype == customSubtype;
+        other.customSubtype == customSubtype &&
+        other.displayName == displayName &&
+        other.description == description;
   }
 
   @override
   int get hashCode {
     return paymentMethod.hashCode ^
         identifier.hashCode ^
-        integrationId.hashCode ^
-        customSubtype.hashCode;
+        customSubtype.hashCode ^
+        displayName.hashCode ^
+        description.hashCode;
   }
 }

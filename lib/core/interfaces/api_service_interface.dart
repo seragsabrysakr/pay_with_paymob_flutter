@@ -17,6 +17,15 @@ abstract class ApiServiceInterface {
     Options? options,
   });
 
+  /// Make a multipart POST request
+  Future<Response<T>> postMultipart<T>(
+    String path, {
+    Map<String, dynamic>? fields,
+    Map<String, dynamic>? files,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  });
+
   /// Set authorization header
   void setAuthToken(String token);
 
