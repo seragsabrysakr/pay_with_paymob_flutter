@@ -5,7 +5,8 @@ import 'app_config.dart';
 class LiveConfig {
   static AppConfig get config => AppConfig(
      apiKey: "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T0RNMU1ERXlMQ0p1WVcxbElqb2lNVFk0T0RrNU9USXdOQzR3TURrNE5ETWlmUS5fX1dORVJNb3h3enBkeFZycjBmX0dXRWNkQnFuSUU0MFRPVElhSkl1LVQ1eXZKRXpFWnFXQngtTWd5T2t1TElaMkJJckg2ZkZ2SWpEb3kwbm13UHc0Zw==",
-    
+       publicKey: "egy_pk_live_7HrErHpj5XXQ2D3TDW7ldTrEajtXYkPM",
+    secretKey: "egy_sk_live_34a4925414ec1b4cac9f5bbefab4e099953b9e76c1407e759260c366a6471c78",
     paymentMethods: [
       const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.custom,
@@ -116,7 +117,7 @@ class LiveConfig {
     iframes: [
       PaymobIframe(
         iframeId: 769581,
-        integrationId: 5090202, // MID_TAKSEET for Installment_Discount
+        integrationId: 4833395, // MID_TAKSEET for Installment_Discount
         name: "Live Installment_Discount",
         description: "Live Installment / Discount IFrame",
       ),
@@ -128,7 +129,7 @@ class LiveConfig {
       ),
       PaymobIframe(
         iframeId: 769630,
-        integrationId: 5265795, // valU for valU iframe
+        integrationId: 5186925, // valU for valU iframe
         name: "Live valU",
         description: "Live valU iFrame",
       ),

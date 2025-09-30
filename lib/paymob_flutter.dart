@@ -75,23 +75,26 @@ import 'core/exceptions/paymob_exceptions.dart';
 import 'core/interfaces/payment_service_interface.dart';
 import 'core/services/api_service.dart';
 import 'models/billing_data.dart';
+import 'models/payment_intention_request.dart';
 import 'models/payment_link_request.dart';
 import 'models/payment_method_config.dart';
 import 'models/paymob_iframe_config.dart';
 import 'models/paymob_response.dart';
+import 'models/unified_checkout_config.dart';
 import 'services/payment_api_service.dart';
 import 'ui/widgets/paymob_inapp_webview.dart';
 
 // Export all public classes
-export 'models/auth_token_request.dart';
-export 'models/auth_token_response.dart';
 export 'models/billing_data.dart';
+export 'models/payment_intention_request.dart';
+export 'models/payment_intention_response.dart';
 export 'models/payment_link_request.dart';
 export 'models/payment_link_response.dart';
 export 'models/payment_method_config.dart';
 export 'models/paymob_iframe_config.dart';
 export 'models/paymob_payment_method.dart';
 export 'models/paymob_response.dart';
+export 'models/unified_checkout_config.dart';
 
 /// Main Paymob Flutter payment service
 ///
@@ -113,6 +116,8 @@ class PaymobFlutter implements PaymentServiceInterface {
 
   // Configuration
   String? _apiKey;
+  String? _publicKey;
+  String? _secretKey;
   List<PaymentMethodConfig> _availablePaymentMethods = [];
   List<PaymobIframe> _availableIframes = [];
   int _userTokenExpiration = 3600;
@@ -121,6 +126,8 @@ class PaymobFlutter implements PaymentServiceInterface {
   /// Initialize with PaymentMethodConfig list (recommended)
   Future<bool> initializeWithConfig({
     required String apiKey,
+    required String publicKey,
+    required String secretKey,
     required List<PaymentMethodConfig> paymentMethods,
     required List<PaymobIframe> iframes,
     int? defaultIntegrationId,
@@ -131,6 +138,12 @@ class PaymobFlutter implements PaymentServiceInterface {
     // Validate inputs
     if (apiKey.isEmpty) {
       throw const InvalidApiKeyException('API key cannot be empty');
+    }
+    if (publicKey.isEmpty) {
+      throw const InvalidApiKeyException('Public key cannot be empty');
+    }
+    if (secretKey.isEmpty) {
+      throw const InvalidApiKeyException('Secret key cannot be empty');
     }
     if (paymentMethods.isEmpty) {
       throw const PaymentInitializationException(
@@ -147,6 +160,8 @@ class PaymobFlutter implements PaymentServiceInterface {
 
     // Store configuration
     _apiKey = apiKey;
+    _publicKey = publicKey;
+    _secretKey = secretKey;
     _availablePaymentMethods = List.from(paymentMethods);
     _availableIframes = List.from(iframes);
     _userTokenExpiration = userTokenExpiration;
@@ -164,9 +179,8 @@ class PaymobFlutter implements PaymentServiceInterface {
     int userTokenExpiration = 3600,
   }) async {
     // This method is deprecated - use initializeWithConfig() instead
-    // You need to provide PaymentMethodConfig objects with identifiers
     throw const PaymentInitializationException(
-        'Please use initializeWithConfig() method and provide PaymentMethodConfig objects with identifiers');
+        'Please use initializeWithConfig() method with publicKey and secretKey for Unified Checkout');
   }
 
   @override
@@ -181,6 +195,7 @@ class PaymobFlutter implements PaymentServiceInterface {
   List<PaymobIframe> get availableIframes => List.from(_availableIframes);
 
   @override
+  @Deprecated('Use payWithUnifiedCheckout instead')
   Future<void> payWithCustomMethod({
     required BuildContext context,
     required PaymentMethodConfig paymentMethod,
@@ -191,41 +206,61 @@ class PaymobFlutter implements PaymentServiceInterface {
     void Function(PaymentPaymobResponse response)? onPayment,
     BillingData? billingData,
   }) async {
+    throw const PaymentInitializationException(
+        'payWithCustomMethod is deprecated. Use payWithUnifiedCheckout instead.');
+  }
+
+  /// Pay with Unified Checkout (replaces payWithCustomMethod)
+  Future<void> payWithUnifiedCheckout({
+    required BuildContext context,
+    required String currency,
+    required double amount,
+    required List<int> paymentMethodIntegrationIds,
+    Widget? title,
+    Color? appBarColor,
+    void Function(PaymentPaymobResponse response)? onPayment,
+    BillingData? billingData,
+    String? specialReference,
+    List<Map<String, dynamic>>? items,
+    Map<String, dynamic>? extras,
+  }) async {
     _validateInitialization();
-    _validatePaymentMethod(paymentMethod);
 
     try {
-      // Get API key
-      await _paymentApiService.getAuthenticationToken(_apiKey!);
-
-      // Create order
-      await _paymentApiService.createOrder(amount, currency);
-
-      // Request payment token
-      final paymentToken = await _paymentApiService.requestPaymentToken(
+      // Create Payment Intention Request
+      final paymentIntentionRequest = PaymentIntentionRequest.create(
         amount: amount,
         currency: currency,
-        integrationId: paymentMethod.integrationId,
+        paymentMethodIntegrationIds: paymentMethodIntegrationIds,
         billingData: billingData ?? BillingData(),
-        userTokenExpiration: _userTokenExpiration,
-        
+        customer: CustomerData.fromBillingData(billingData ?? BillingData()),
+        specialReference: specialReference,
+        items: items,
+        extras: extras,
       );
 
-      // Request wallet URL
-
-      final payUrl = await _paymentApiService.requestPayUrl(
-        paymentToken: paymentToken,
-        identifier: paymentMethod.identifier,
-        subtype: paymentMethod.customSubtype,
+      // Create Payment Intention
+      final paymentIntentionResponse = await _paymentApiService.createPaymentIntention(
+        request: paymentIntentionRequest,
+        secretKey: _secretKey!,
       );
-      debugPrint('cus: $payUrl');
+
+      // Create Unified Checkout Config
+      final unifiedCheckoutConfig = UnifiedCheckoutConfig.fromPaymentIntention(
+        publicKey: _publicKey!,
+        response: paymentIntentionResponse,
+        title: title?.toString(),
+      );
+
+      debugPrint('Unified Checkout URL: ${unifiedCheckoutConfig.checkoutUrl}');
+
       // Show payment interface
       if (context.mounted) {
         await PaymobInAppWebView.show(
-          title: title ?? Text(paymentMethod.displayName),
+          title: title ?? const Text('Paymob Payment'),
           appBarColor: appBarColor,
           context: context,
-          redirectURL: payUrl,
+          redirectURL: unifiedCheckoutConfig.checkoutUrl,
           onPayment: (response) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               onPayment?.call(response);
@@ -234,7 +269,6 @@ class PaymobFlutter implements PaymentServiceInterface {
         );
       }
     } catch (e) {
-      _paymentApiService.clearAuth();
       rethrow;
     }
   }
@@ -300,15 +334,16 @@ class PaymobFlutter implements PaymentServiceInterface {
       throw const PaymentInitializationException(
           'PaymobFlutter must be initialized before use');
     }
+    _validateUnifiedCheckoutKeys();
   }
 
-  /// Validate that the payment method is available
-  void _validatePaymentMethod(PaymentMethodConfig paymentMethod) {
-    if (!_availablePaymentMethods.contains(paymentMethod)) {
-      final availableNames =
-          _availablePaymentMethods.map((config) => config.displayName).toList();
-      throw PaymentMethodNotAvailableException(
-          paymentMethod.displayName, availableNames);
+  /// Validate that the service has required keys for Unified Checkout
+  void _validateUnifiedCheckoutKeys() {
+    if (_publicKey == null || _publicKey!.isEmpty) {
+      throw const InvalidApiKeyException('Public key is required for Unified Checkout');
+    }
+    if (_secretKey == null || _secretKey!.isEmpty) {
+      throw const InvalidApiKeyException('Secret key is required for Unified Checkout');
     }
   }
 

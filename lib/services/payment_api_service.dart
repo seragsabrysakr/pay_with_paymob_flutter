@@ -1,10 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+
 import '../core/constants/api_constants.dart';
 import '../core/exceptions/paymob_exceptions.dart';
 import '../core/interfaces/api_service_interface.dart';
 import '../models/billing_data.dart';
+import '../models/payment_intention_request.dart';
+import '../models/payment_intention_response.dart';
 import '../models/payment_link_request.dart';
 import '../models/payment_link_response.dart';
 
@@ -125,12 +129,12 @@ class PaymentApiService {
           requestData["source"]["subtype"] = subtype;
         }
       }
-log('requestData: $requestData');
+   log('requestData: $requestData');
       final response = await _apiService.post<Map<String, dynamic>>(
         ApiConstants.wallet,
         data: requestData,
       );
-log('response: $response');
+   log('response: $response');
       if (response.statusCode != null && response.statusCode! >= 200) {
         final body = response.data;
         log('redirect_url: ${body?["redirect_url"]}');
@@ -156,6 +160,39 @@ log('response: $response');
   }
 
   
+
+  /// Create Payment Intention for Unified Checkout
+  Future<PaymentIntentionResponse> createPaymentIntention({
+    required PaymentIntentionRequest request,
+    required String secretKey,
+  }) async {
+    try {
+      log('Creating payment intention with data: ${request.toJson()}');
+      
+      final response = await _apiService.post<Map<String, dynamic>>(
+        ApiConstants.paymentIntention,
+        data: request.toJson(),
+        options: Options(
+          headers: {
+            'Authorization': 'Token $secretKey',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      log('Payment intention response: $response');
+
+      if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
+        return PaymentIntentionResponse.fromJson(response.data!);
+      } else {
+        throw const PaymentIntentionException('Failed to create payment intention');
+      }
+    } catch (e) {
+      if (e is PaymobException) rethrow;
+      log('Error creating payment intention: $e');
+      throw const PaymentIntentionException('Failed to create payment intention');
+    }
+  }
 
   /// Create a payment link
   Future<PaymentLinkResponse> createPaymentLink({

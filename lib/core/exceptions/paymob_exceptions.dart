@@ -61,3 +61,9 @@ class PaymentLinkException extends PaymobException {
   const PaymentLinkException([String? message]) 
       : super(message ?? 'Failed to process payment link');
 }
+
+/// Exception thrown when payment intention operations fail
+class PaymentIntentionException extends PaymobException {
+  const PaymentIntentionException([String? message]) 
+      : super(message ?? 'Failed to process payment intention');
+}

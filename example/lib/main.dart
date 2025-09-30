@@ -18,6 +18,8 @@ void main() {
   // Initialize Paymob with the configuration
   PaymobFlutter.instance.initializeWithConfig(
     apiKey: config.apiKey,
+    publicKey: config.publicKey,
+    secretKey: config.secretKey,
     paymentMethods: config.paymentMethods,
     iframes: config.iframes,
     defaultIntegrationId: config.defaultIntegrationId,

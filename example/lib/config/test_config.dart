@@ -5,8 +5,9 @@ import 'app_config.dart';
 class TestConfig {
   static AppConfig get config => AppConfig(
     apiKey: "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T0RNMU1ERXlMQ0p1WVcxbElqb2lNVFk0T0RrNU9USXdOQzR3TURrNE5ETWlmUS5fX1dORVJNb3h3enBkeFZycjBmX0dXRWNkQnFuSUU0MFRPVElhSkl1LVQ1eXZKRXpFWnFXQngtTWd5T2t1TElaMkJJckg2ZkZ2SWpEb3kwbm13UHc0Zw==",
-    // apiKey: "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRBM05qQTBOQ3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS5ZaUhYMjQ1UUZqZjI3UXJPMVJtM3hNWnV4aWdsN19RQVU5Zmo5bVk5a096ZDhMamJnRXE2MS1LNGhFUWlHbnprVU05Q1JWS3hpcm1nMnM1ZXBQTDJWQQ==",
-    
+    publicKey: "egy_pk_test_k2czgVhTAQG5nKsHYGCT9MH1UM0Qosz6",
+    secretKey: "egy_sk_test_3dea506a59c4cbb93b88e0a9fa7176c393a5e8f27da1d97e1892f8429352255f",
+     
     paymentMethods: [
       const PaymentMethodConfig(
         paymentMethod: PaymobPaymentMethod.custom,
