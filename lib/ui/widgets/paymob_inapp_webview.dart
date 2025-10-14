@@ -156,11 +156,11 @@ class _PaymobInAppWebViewState extends State<PaymobInAppWebView> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
+                  child: const Text('Cancel',style: TextStyle(color: Colors.white),),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Exit'),
+                  child: const Text('Exit',style: TextStyle(color: Colors.white),),
                 ),
               ],
             );
