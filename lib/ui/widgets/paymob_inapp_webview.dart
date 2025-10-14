@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../models/paymob_response.dart';
-import 'dart:io';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class PaymobInAppWebView extends StatefulWidget {
   final String redirectURL;
@@ -43,52 +41,11 @@ class PaymobInAppWebView extends StatefulWidget {
 }
 
 class _PaymobInAppWebViewState extends State<PaymobInAppWebView> {
-  late WebViewController webViewController;
+  late InAppWebViewController webViewController;
   bool isLoading = true;
 
   @override
   Widget build(BuildContext context) {
-    // Initialize WebView for Android
-    if (Platform.isAndroid) {
-      WebViewPlatform.instance = AndroidWebViewPlatform();
-    }
-    // Initialize WebViewController
-    webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            if (kDebugMode) {
-              print("Page started loading: $url");
-            }
-            setState(() => isLoading = true);
-          },
-          onPageFinished: (String url) {
-            if (kDebugMode) {
-              print("Page finished loading: $url");
-            }
-            setState(() => isLoading = false);
-
-            // Check for payment response in URL
-            if (url.contains('txn_response_code') &&
-                url.contains('success') &&
-                url.contains('id')) {
-              final params = Uri.parse(url).queryParameters;
-              final response = PaymentPaymobResponse.fromJson(params);
-              if (kDebugMode) {
-                print(params);
-              }
-
-              if (widget.onPayment != null) {
-                widget.onPayment!(response);
-              }
-              Navigator.pop(context, response);
-            }
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(widget.redirectURL));
-
     return Scaffold(
       appBar: AppBar(
           title: widget.title ?? const Text('Paymob Payment'),
@@ -96,7 +53,48 @@ class _PaymobInAppWebViewState extends State<PaymobInAppWebView> {
           backgroundColor: widget.appBarColor),
       body: Stack(
         children: [
-          WebViewWidget(controller: webViewController),
+          InAppWebView(
+            initialUrlRequest: URLRequest(url: WebUri(widget.redirectURL)),
+            initialSettings: InAppWebViewSettings(
+                javaScriptEnabled: true,
+                useOnLoadResource: true,
+                useHybridComposition: true,
+                allowsInlineMediaPlayback: true,
+                allowsLinkPreview: true),
+            onWebViewCreated: (controller) {
+              webViewController = controller;
+            },
+            onLoadStart: (controller, url) {
+              if (kDebugMode) {
+                print("Page started loading: $url");
+              }
+              setState(() => isLoading = true);
+            },
+            onLoadStop: (controller, url) {
+              if (kDebugMode) {
+                print("Page finished loading: $url");
+              }
+              setState(() => isLoading = false);
+
+              if (url != null) {
+                final urlString = url.toString();
+                if (urlString.contains('txn_response_code') &&
+                    urlString.contains('success') &&
+                    urlString.contains('id')) {
+                  final params = Uri.parse(urlString).queryParameters;
+                  final response = PaymentPaymobResponse.fromJson(params);
+                  if (kDebugMode) {
+                    print(params);
+                  }
+
+                  if (widget.onPayment != null) {
+                    widget.onPayment!(response);
+                  }
+                  Navigator.pop(context, response);
+                }
+              }
+            },
+          ),
           if (isLoading)
             const Center(child: CircularProgressIndicator.adaptive()),
         ],
