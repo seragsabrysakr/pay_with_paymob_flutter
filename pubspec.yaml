@@ -26,7 +26,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.4.0
-  flutter_inappwebview: ^6.1.5
+  webview_flutter: ^4.11.0
 
 dev_dependencies:
   flutter_test:

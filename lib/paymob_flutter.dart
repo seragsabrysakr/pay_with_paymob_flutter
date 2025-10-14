@@ -240,7 +240,8 @@ class PaymobFlutter implements PaymentServiceInterface {
       );
 
       // Create Payment Intention
-      final paymentIntentionResponse = await _paymentApiService.createPaymentIntention(
+      final paymentIntentionResponse =
+          await _paymentApiService.createPaymentIntention(
         request: paymentIntentionRequest,
         secretKey: _secretKey!,
       );
@@ -292,7 +293,7 @@ class PaymobFlutter implements PaymentServiceInterface {
       await _paymentApiService.getAuthenticationToken(_apiKey!);
 
       // Create order
-       await _paymentApiService.createOrder(amount, currency);
+      await _paymentApiService.createOrder(amount, currency);
 
       // Request payment token
       final paymentToken = await _paymentApiService.requestPaymentToken(
@@ -301,7 +302,6 @@ class PaymobFlutter implements PaymentServiceInterface {
         integrationId: iframe.integrationId.toString(),
         billingData: billingData ?? BillingData(),
         userTokenExpiration: _userTokenExpiration,
-        
       );
 
       // Build iframe URL
@@ -340,10 +340,12 @@ class PaymobFlutter implements PaymentServiceInterface {
   /// Validate that the service has required keys for Unified Checkout
   void _validateUnifiedCheckoutKeys() {
     if (_publicKey == null || _publicKey!.isEmpty) {
-      throw const InvalidApiKeyException('Public key is required for Unified Checkout');
+      throw const InvalidApiKeyException(
+          'Public key is required for Unified Checkout');
     }
     if (_secretKey == null || _secretKey!.isEmpty) {
-      throw const InvalidApiKeyException('Secret key is required for Unified Checkout');
+      throw const InvalidApiKeyException(
+          'Secret key is required for Unified Checkout');
     }
   }
 
@@ -382,15 +384,15 @@ class PaymobFlutter implements PaymentServiceInterface {
       );
 
       // Step 3: Open as web view (same way as other payment methods)
-      if (context.mounted) {
-        await PaymobInAppWebView.show(
-          context: context,
-          redirectURL: paymentLinkResponse.clientUrl,
-          title: title ?? const Text('Payment Link'),
-          appBarColor: appBarColor,
-          onPayment: onPayment,
-        );
-      }
+      // if (context.mounted) {
+      await PaymobInAppWebView.show(
+        context: context,
+        redirectURL: paymentLinkResponse.clientUrl,
+        title: title ?? const Text('Payment Link'),
+        appBarColor: appBarColor,
+        onPayment: onPayment,
+      );
+      // }
     } catch (e) {
       _paymentApiService.clearAuth();
       rethrow;
