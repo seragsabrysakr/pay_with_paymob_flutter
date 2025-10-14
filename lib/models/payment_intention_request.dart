@@ -3,6 +3,7 @@ import 'billing_data.dart';
 /// Payment Intention Request model for Paymob Unified Checkout
 class PaymentIntentionRequest {
   final int amount;
+  final int? expiration;
   final String? specialReference;
   final String currency;
   final List<int> paymentMethods;
@@ -13,6 +14,7 @@ class PaymentIntentionRequest {
 
   const PaymentIntentionRequest({
     required this.amount,
+      this.expiration,
     this.specialReference,
     required this.currency,
     required this.paymentMethods,
@@ -27,6 +29,7 @@ class PaymentIntentionRequest {
     return {
       'amount': amount,
       if (specialReference != null) 'special_reference': specialReference,
+      if (expiration != null) 'expiration': expiration,
       'currency': currency,
       'payment_methods': paymentMethods,
       'items': items,
@@ -44,11 +47,13 @@ class PaymentIntentionRequest {
     required BillingData billingData,
     required CustomerData customer,
     String? specialReference,
+    int? expiration,
     List<Map<String, dynamic>>? items,
     Map<String, dynamic>? extras,
   }) {
     return PaymentIntentionRequest(
       amount: (amount * 100).round(), // Convert to cents
+      expiration: expiration,
       specialReference: specialReference,
       currency: currency,
       paymentMethods: paymentMethodIntegrationIds,

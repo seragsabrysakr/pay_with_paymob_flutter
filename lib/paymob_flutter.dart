@@ -215,6 +215,7 @@ class PaymobFlutter implements PaymentServiceInterface {
     required BuildContext context,
     required String currency,
     required double amount,
+    int? expiration,
     required List<int> paymentMethodIntegrationIds,
     Widget? title,
     Color? appBarColor,
@@ -231,6 +232,7 @@ class PaymobFlutter implements PaymentServiceInterface {
       final paymentIntentionRequest = PaymentIntentionRequest.create(
         amount: amount,
         currency: currency,
+        expiration: expiration,
         paymentMethodIntegrationIds: paymentMethodIntegrationIds,
         billingData: billingData ?? BillingData(),
         customer: CustomerData.fromBillingData(billingData ?? BillingData()),
@@ -256,7 +258,7 @@ class PaymobFlutter implements PaymentServiceInterface {
       debugPrint('Unified Checkout URL: ${unifiedCheckoutConfig.checkoutUrl}');
 
       // Show payment interface
-      if (context.mounted) {
+      // if (context.mounted) {
         await PaymobInAppWebView.show(
           title: title ?? const Text('Paymob Payment'),
           appBarColor: appBarColor,
@@ -268,7 +270,7 @@ class PaymobFlutter implements PaymentServiceInterface {
             });
           },
         );
-      }
+      // }
     } catch (e) {
       rethrow;
     }
